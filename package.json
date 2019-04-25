@@ -9,7 +9,7 @@
     "build": "nuxt build",
     "start": "nuxt start",
     "generate": "nuxt generate",
-    "test": "jest"
+    "test": "jest && sleep 3s && cat pikachu.txt"
   },
   "dependencies": {
     "@nuxtjs/axios": "^5.3.6",

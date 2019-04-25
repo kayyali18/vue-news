@@ -1,0 +1,25 @@
+// Jest Snapshot v1, https://goo.gl/fbAQLP
+
+exports[`HomePage to match Snapshot 1`] = `
+<main>
+  <p>
+    The Thinker
+  </p>
+   
+  <button
+    class="md-button md-theme-default"
+    type="button"
+  >
+    <div
+      class="md-ripple"
+    >
+      <div
+        class="md-button-content"
+      >
+        Submit
+      </div>
+       
+    </div>
+  </button>
+</main>
+`;
