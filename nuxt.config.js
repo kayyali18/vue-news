@@ -26,7 +26,7 @@ module.exports = {
   /*
   ** Customize the progress-bar color
   */
-  loading: { color: '#fff' },
+  loading: { color: '	#ffbf00', height: '10px' },
 
   /*
   ** Global CSS
@@ -35,6 +35,10 @@ module.exports = {
     {
       src: 'vue-material/dist/vue-material.min.css',
       lang: 'css'
+    },
+    {
+      src: '~/assets/theme.scss',
+      lang: 'scss'
     }
   ],
 

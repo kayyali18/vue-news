@@ -1,0 +1,12 @@
+@import '~vue-material/dist/theme/engine';
+
+@include md-register-theme(
+  'default',
+  (
+    primary: md-get-palette-color(white, 800),
+    accent: md-get-palette-color(amber, 600),
+    theme: dark
+  )
+);
+
+@import '~vue-material/dist/theme/all';
