@@ -2,6 +2,10 @@
   <main class="md-layout md-alignment-center landing-page">
     <!-- App Content -->
 
+    <header class="md-layout-item md-size-90 header">
+      <h1>The Thinker</h1>
+    </header>
+
     <div class="md-layout-item md-size-95">
       <md-content class="md-layout md-gutter gutter">
         <ul v-for="headline in headlines" :key="headline.id" class="md-layout-item md-large-size-25 md-medium-size-33 md-small-size-50 md-xsmall-size-100">
@@ -70,6 +74,20 @@ export default {
 @import '~assets/theme.scss';
 
 .landing-page {
+  /* background-color: $background-gray; */
+
+  .header {
+    height: 100px;
+    display: flex;
+    align-items: center;
+
+    h1 {
+      color: $deep-orange;
+      font-family: 'Tangerine', cursive;
+      font-size: calc(56px + 0.3vw);
+      margin: 0;
+    }
+  }
   .gutter {
     /* background: $gold; */
     padding: 1rem;
