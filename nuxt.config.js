@@ -58,16 +58,30 @@ module.exports = {
   modules: [
     // Doc: https://axios.nuxtjs.org/usage
     '@nuxtjs/axios',
-    '@nuxtjs/pwa'
+    '@nuxtjs/pwa',
+    '@nuxtjs/proxy'
   ],
   /*
   ** Axios module configuration
   */
   axios: {
     // See https://github.com/nuxt-community/axios-module#options
-    credentials: true
+    credentials: true,
+    proxy: true
   },
-
+  /*
+  ** Proxy module configuration
+  * PathRewrite is a regex to select string
+  * Sets it to empty string
+  * because value as proxy is added to target,
+  * we just wanna rename target to /api
+  */
+  proxy: {
+    '/api': {
+      target: 'https://newsapi.org/v2/',
+      pathRewrite: { '^/api/': '' }
+    }
+  },
   /*
   ** Env configuration
   */
