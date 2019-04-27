@@ -1,6 +1,7 @@
 export const state = () => ({
-  headlines: [],
   category: '',
+  country: 'us',
+  headlines: [],
   loading: false
 })
 
@@ -9,6 +10,9 @@ export const state = () => ({
 export const mutations = {
   setCategory(state, category) {
     state.category = category
+  },
+  setCountry(state, country) {
+    state.country = country
   },
   setHeadlines(state, headlines) {
     state.headlines = headlines
@@ -33,6 +37,7 @@ export const actions = {
 
 export const getters = {
   category: state => state.category,
+  country: state => state.country,
   headlines: state => state.headlines,
   loading: state => state.loading
 }

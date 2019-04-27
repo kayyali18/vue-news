@@ -2,7 +2,7 @@
   <main class="md-layout md-alignment-center landing-page">
     <!-- Top Navigation -->
     <md-toolbar class="fixed-toolbar" elevation="1">
-      <md-button class="md-icon-button">
+      <md-button @click="showLeftSidepanel = true" class="md-icon-button">
         <md-icon>menu</md-icon>
       </md-button>
 
@@ -13,15 +13,34 @@
       <div class="md-toolbar-section-end">
         <md-button @click="$router.push('/login')">Login</md-button>
         <md-button @click="$router.push('/register')">Register</md-button>
-        <md-button class="md-accent" @click="showSidePanel = true">
+        <md-button class="md-accent" @click="showRightSidepanel = true">
           Categories
         </md-button>
       </div>
     </md-toolbar>
 
+    <!-- Personal News Feed (Left - Drawer) -->
+    <md-drawer md-fixed :md-active.sync="showLeftSidepanel">
+      <md-toolbar md-elevation="1">
+        <span class="md-title">Personal Feed</span>
+      </md-toolbar>
+
+      <md-progress-bar v-if="loading" md-mode="indeterminate"></md-progress-bar>
+
+      <md-field>
+        <label for="country">Country</label>
+        <md-select @input="changeCountry" :value="country" name="country" id="country">
+          <md-option value="ae">Arabia</md-option>
+          <md-option value="ca">Canada</md-option>
+          <md-option value="gb">United Kingdom</md-option>
+          <md-option value="us">United States</md-option>
+        </md-select>
+      </md-field>
+    </md-drawer>
+
     <!-- News Categories (Right - Drawer)  -->
 
-    <md-drawer class="md-right" md-fixed :md-active.sync="showSidePanel">
+    <md-drawer class="md-right" md-fixed :md-active.sync="showRightSidepanel">
       <md-toolbar :md-elevation="1">
         <span class="md-title">News Categories</span>
       </md-toolbar>
@@ -96,7 +115,8 @@
 <script>
 export default {
   data: () => ({
-    showSidePanel: false,
+    showLeftSidepanel: false,
+    showRightSidepanel: false,
     newsCategories: [
       { name: 'Top Headlines', path: '', icon: 'today' },
       { name: 'Technology', path: 'technology', icon: 'keyboard' },
@@ -111,12 +131,25 @@ export default {
   async fetch({ store }) {
     await store.dispatch(
       'loadHeadlines',
-      `/api/top-headlines?country=us&category=${store.state.category}`
+      `/api/top-headlines?country=${store.state.country}&category=${
+        store.state.category
+      }`
     )
+  },
+  watch: {
+    async country() {
+      await this.$store.dispatch(
+        'loadHeadlines',
+        `/api/top-headlines?country=${this.country}&category=${this.category}`
+      )
+    }
   },
   computed: {
     category() {
       return this.$store.getters.category
+    },
+    country() {
+      return this.$store.getters.country
     },
     headlines() {
       return this.$store.getters.headlines
@@ -126,11 +159,14 @@ export default {
     }
   },
   methods: {
+    changeCountry(country) {
+      this.$store.commit('setCountry', country)
+    },
     async loadCategory(category) {
       this.$store.commit('setCategory', category)
       await this.$store.dispatch(
         'loadHeadlines',
-        `/api/top-headlines?country=us&category=${this.category}`
+        `/api/top-headlines?country=${this.country}&category=${this.category}`
       )
     }
   }
