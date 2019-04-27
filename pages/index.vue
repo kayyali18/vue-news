@@ -1,10 +1,44 @@
 <template>
   <main class="md-layout md-alignment-center landing-page">
-    <!-- App Content -->
+    <!-- Top Navigation -->
+    <md-toolbar class="fixed-toolbar" elevation="1">
+      <md-button class="md-icon-button">
+        <md-icon>menu</md-icon>
+      </md-button>
 
-    <header class="md-layout-item md-size-90 header">
-      <h1>The Thinker</h1>
-    </header>
+      <nuxt-link class="md-primary md-title header" to="/">
+        <h1>The Thinker</h1>
+      </nuxt-link>
+
+      <div class="md-toolbar-section-end">
+        <md-button @click="$router.push('/login')">Login</md-button>
+        <md-button @click="$router.push('/register')">Register</md-button>
+        <md-button class="md-accent" @click="showSidePanel = true">
+          Categories
+        </md-button>
+      </div>
+    </md-toolbar>
+
+    <!-- News Categories (Right - Drawer)  -->
+
+    <md-drawer class="md-right" md-fixed :md-active.sync="showSidePanel">
+      <md-toolbar :md-elevation="1">
+        <span class="md-title">News Categories</span>
+      </md-toolbar>
+
+      <md-progress-bar v-if="loading" md-mode="indeterminate"></md-progress-bar>
+
+      <md-list>
+        <md-subheader class="md-primary">Categories</md-subheader>
+
+        <md-list-item v-for="newsCategory in newsCategories" :key="newsCategory.name" @click="loadCategory(newsCategory.path)">
+          <md-icon :class="newsCategory.path == category ? 'md-primary' : ''">{{newsCategory.icon}}</md-icon>
+          <span class="md-list-item-text">{{newsCategory.name}}</span>
+        </md-list-item>
+      </md-list>
+    </md-drawer>
+
+    <!-- Headlines -->
 
     <div class="md-layout-item md-size-95">
       <md-content class="md-layout md-gutter gutter">
@@ -61,11 +95,44 @@
 
 <script>
 export default {
+  data: () => ({
+    showSidePanel: false,
+    newsCategories: [
+      { name: 'Top Headlines', path: '', icon: 'today' },
+      { name: 'Technology', path: 'technology', icon: 'keyboard' },
+      { name: 'Business', path: 'business', icon: 'business_center' },
+      { name: 'Entertainment', path: 'entertainment', icon: 'weekend' },
+      { name: 'Health', path: 'health', icon: 'fastfood' },
+      { name: 'Science', path: 'science', icon: 'fingerprint' },
+      { name: 'Sports', path: 'sports', icon: 'pool' }
+    ]
+  }),
   // Has access to context object
-  async asyncData({ app }) {
-    const topHeadlines = await app.$axios.$get('/api/top-headlines?country=us')
-
-    return { headlines: topHeadlines.articles }
+  async fetch({ store }) {
+    await store.dispatch(
+      'loadHeadlines',
+      `/api/top-headlines?country=us&category=${store.state.category}`
+    )
+  },
+  computed: {
+    category() {
+      return this.$store.getters.category
+    },
+    headlines() {
+      return this.$store.getters.headlines
+    },
+    loading() {
+      return this.$store.getters.loading
+    }
+  },
+  methods: {
+    async loadCategory(category) {
+      this.$store.commit('setCategory', category)
+      await this.$store.dispatch(
+        'loadHeadlines',
+        `/api/top-headlines?country=us&category=${this.category}`
+      )
+    }
   }
 }
 </script>
@@ -99,6 +166,13 @@ export default {
 
   .small-icon {
     font-size: 18px !important;
+  }
+
+  .fixed-toolbar {
+    position: sticky;
+    top: 0;
+
+    z-index: 4;
   }
 }
 </style>
