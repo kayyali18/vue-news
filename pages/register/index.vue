@@ -35,6 +35,7 @@
 
 <script>
 export default {
+  middleware: 'auth',
   data: () => ({
     form: {
       email: '',
