@@ -49,7 +49,8 @@ module.exports = {
     { src: '@/plugins/vue-material' },
     {
       src: '@/plugins/axios'
-    }
+    },
+    { src: '@/plugins/firestore' }
   ],
 
   /*
