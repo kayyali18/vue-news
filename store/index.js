@@ -1,4 +1,5 @@
 import md5 from 'md5'
+import db from '@/plugins/firestore'
 
 export const state = () => ({
   category: '',
@@ -52,6 +53,11 @@ export const actions = {
       const user = { email: authUserData.email, avatar }
       commit('setUser', user)
 
+      // Put user in Database
+      await db
+        .collection('users')
+        .doc(userPayload.email)
+        .set(user)
       // Set token
       commit('setToken', authUserData.idToken)
 
