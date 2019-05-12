@@ -37,8 +37,8 @@
 
       <md-progress-bar v-if="loading" md-mode="indeterminate"></md-progress-bar>
 
-      <md-field>
-        <label for="country">Country</label>
+      <md-field class="side-padding">
+        <label class="side-padding" for="country">Country</label>
         <md-select @input="changeCountry" :value="country" name="country" id="country">
           <md-option value="ae">Arabia</md-option>
           <md-option value="ca">Canada</md-option>
@@ -228,6 +228,11 @@ export default {
     top: 0;
 
     z-index: 4;
+  }
+
+  .side-padding {
+    padding-left: 1rem;
+    padding-right: 1rem;
   }
 }
 </style>
