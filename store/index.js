@@ -1,5 +1,6 @@
 import md5 from 'md5'
 import db from '@/plugins/firestore'
+import { saveUserData } from '@/utils/'
 
 export const state = () => ({
   category: '',
@@ -63,8 +64,11 @@ export const actions = {
           .doc(userPayload.email)
           .set(user)
       } else {
+        // Get user credentials
         const loginRef = db.collection('users').doc(userPayload.email)
         const loggedInUser = await loginRef.get()
+
+        // Set user to logged in data
         user = loggedInUser.data()
       }
 
@@ -76,6 +80,9 @@ export const actions = {
 
       // Loading
       commit('setLoading', false)
+
+      // Save user
+      saveUserData(authUserData, user)
     } catch (error) {
       console.error(error)
 
