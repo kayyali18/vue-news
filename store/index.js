@@ -1,6 +1,6 @@
 import md5 from 'md5'
 import db from '@/plugins/firestore'
-import { saveUserData } from '@/utils/'
+import { saveUserData, clearUserData } from '@/utils/'
 
 export const state = () => ({
   category: '',
@@ -14,6 +14,8 @@ export const state = () => ({
 // ------- Mutations -------
 
 export const mutations = {
+  clearToken: state => (state.token = ''),
+  clearUser: state => (state.user = null),
   setCategory(state, category) {
     state.category = category
   },
@@ -95,6 +97,15 @@ export const actions = {
     const { articles } = await this.$axios.$get(apiUrl)
     commit('setLoading', false)
     commit('setHeadlines', articles)
+  },
+  setLogoutTimer({ dispatch }, interval) {
+    // Logout user when token expires
+    setTimeout(() => dispatch('logoutUser'), interval)
+  },
+  logoutUser({ commit }) {
+    commit('clearToken')
+    commit('clearUser')
+    clearUserData()
   }
 }
 
