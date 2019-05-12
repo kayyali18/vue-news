@@ -42,22 +42,35 @@ export const actions = {
       commit('setLoading', true)
 
       // Register User
-      const authUserData = await this.$axios.$post('/register/', userPayload)
+      const authUserData = await this.$axios.$post(`/${userPayload.action}/`, {
+        email: userPayload.email,
+        password: userPayload.password,
+        returnSecureToken: userPayload.returnSecureToken
+      })
 
-      // Get user avatar by hashing their email
-      const avatar = `http://gravatar.com/avatar/${md5(
-        authUserData.email
-      )}?d=identicon`
+      let user
+
+      if (userPayload.action === 'register') {
+        // Get user avatar by hashing their email
+        const avatar = `http://gravatar.com/avatar/${md5(
+          authUserData.email
+        )}?d=identicon`
+
+        user = { email: authUserData.email, avatar }
+        // Put user in Database
+        await db
+          .collection('users')
+          .doc(userPayload.email)
+          .set(user)
+      } else {
+        const loginRef = db.collection('users').doc(userPayload.email)
+        const loggedInUser = await loginRef.get()
+        user = loggedInUser.data()
+      }
 
       // Create user obj and commit
-      const user = { email: authUserData.email, avatar }
       commit('setUser', user)
 
-      // Put user in Database
-      await db
-        .collection('users')
-        .doc(userPayload.email)
-        .set(user)
       // Set token
       commit('setToken', authUserData.idToken)
 
