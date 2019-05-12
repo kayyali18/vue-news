@@ -2,6 +2,9 @@ const pkg = require('./package')
 
 module.exports = {
   mode: 'spa',
+  router: {
+    middleware: 'check-auth'
+  },
 
   /*
   ** Headers of the page
@@ -86,6 +89,12 @@ module.exports = {
       target:
         'https://www.googleapis.com/identitytoolkit/v3/relyingparty/signupNewUser?key=AIzaSyD_-MD5xNRniFYwX-ofogvRZViz7XJQXoI',
       pathRewrite: { '^/register/': '' }
+    },
+    '/login/': {
+      target:
+        'https://www.googleapis.com/identitytoolkit/v3/relyingparty/verifyPassword?key=AIzaSyD_-MD5xNRniFYwX-ofogvRZViz7XJQXoI',
+
+      pathRewrite: { '^/login/': '' }
     }
   },
   /*
