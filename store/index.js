@@ -110,15 +110,18 @@ export const actions = {
     commit('setHeadlines', articles)
   },
   async loadUserFeed({ state, commit }) {
-    const feedRef = db.collection(`users/${state.user.email}/feed`)
+    // Check if user exists first
+    if (state.user) {
+      const feedRef = db.collection(`users/${state.user.email}/feed`)
 
-    await feedRef.get().then(querySnapshot => {
-      let headlines = []
-      querySnapshot.forEach(doc => {
-        headlines.push(doc.data())
-        commit('setFeed', headlines)
+      await feedRef.get().then(querySnapshot => {
+        let headlines = []
+        querySnapshot.forEach(doc => {
+          headlines.push(doc.data())
+          commit('setFeed', headlines)
+        })
       })
-    })
+    }
   },
   logoutUser({ commit }) {
     commit('clearToken')

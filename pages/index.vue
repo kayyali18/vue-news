@@ -46,6 +46,23 @@
           <md-option value="us">United States</md-option>
         </md-select>
       </md-field>
+
+
+      <!-- Feed Content -->
+      <md-list class="md-triple-line" v-for="headline in feed" :key="headline.id">
+        <md-list-item>
+          <md-avatar><img :src="headline.urlToImage" :alt="headline.title"></md-avatar>
+
+          <div class="md-list-item-text">
+            <span><a :href="headline.url" target="_blank">{{headline.title}}</a></span>
+            <span>{{headline.source.name}}</span>
+            <span>View Comments</span>
+          </div>
+
+          <md-button class="md-icon-button md-list-action"><md-icon class="md-accent">delete</md-icon></md-button>
+        </md-list-item>
+        <md-divider class="md-inset"></md-divider>
+      </md-list>
     </md-drawer>
 
     <!-- News Categories (Right - Drawer)  -->
