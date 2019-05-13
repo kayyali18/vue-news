@@ -25,7 +25,7 @@ export const mutations = {
     state.country = country
   },
   setFeed(state, headlines) {
-    state.feed = headlines
+    state.feed = [...headlines]
   },
   setHeadlines(state, headlines) {
     state.headlines = headlines
@@ -38,6 +38,9 @@ export const mutations = {
   },
   setUser(state, user) {
     state.user = user
+  },
+  pushToFeed(state, headline) {
+    state.feed.push(headline)
   }
 }
 
@@ -118,9 +121,10 @@ export const actions = {
       await feedRef.onSnapshot(querySnapshot => {
         let headlines = []
         querySnapshot.forEach(doc => {
+          // commit('pushToFeed', doc.data())
           headlines.push(doc.data())
+          commit('setFeed', headlines)
         })
-        commit('setFeed', headlines)
       })
     }
   },
