@@ -5,6 +5,7 @@ import { saveUserData, clearUserData } from '@/utils/'
 export const state = () => ({
   category: '',
   country: 'us',
+  feed: [],
   headlines: [],
   loading: false,
   token: '',
@@ -14,6 +15,7 @@ export const state = () => ({
 // ------- Mutations -------
 
 export const mutations = {
+  clearFeed: state => (state.feed = []),
   clearToken: state => (state.token = ''),
   clearUser: state => (state.user = null),
   setCategory(state, category) {
@@ -21,6 +23,9 @@ export const mutations = {
   },
   setCountry(state, country) {
     state.country = country
+  },
+  setFeed(state, headlines) {
+    state.feed = [...headlines]
   },
   setHeadlines(state, headlines) {
     state.headlines = headlines
@@ -33,12 +38,22 @@ export const mutations = {
   },
   setUser(state, user) {
     state.user = user
+  },
+  pushToFeed(state, headline) {
+    state.feed.push(headline)
   }
 }
 
 // ------- Actions -------
 
 export const actions = {
+  async addHeadlineToFeed({ state }, headline) {
+    const feedRef = db
+      .collection(`users/${state.user.email}/feed`)
+      .doc(headline.title)
+
+    await feedRef.set(headline)
+  },
   async authenticateUser({ commit }, userPayload) {
     try {
       // Loading
@@ -98,14 +113,30 @@ export const actions = {
     commit('setLoading', false)
     commit('setHeadlines', articles)
   },
-  setLogoutTimer({ dispatch }, interval) {
-    // Logout user when token expires
-    setTimeout(() => dispatch('logoutUser'), interval)
+  async loadUserFeed({ state, commit }) {
+    // Check if user exists first
+    if (state.user) {
+      const feedRef = db.collection(`users/${state.user.email}/feed`)
+
+      await feedRef.onSnapshot(querySnapshot => {
+        let headlines = []
+        querySnapshot.forEach(doc => {
+          // commit('pushToFeed', doc.data())
+          headlines.push(doc.data())
+          commit('setFeed', headlines)
+        })
+      })
+    }
   },
   logoutUser({ commit }) {
     commit('clearToken')
     commit('clearUser')
+    commit('clearFeed')
     clearUserData()
+  },
+  setLogoutTimer({ dispatch }, interval) {
+    // Logout user when token expires
+    setTimeout(() => dispatch('logoutUser'), interval)
   }
 }
 
@@ -114,6 +145,7 @@ export const actions = {
 export const getters = {
   category: state => state.category,
   country: state => state.country,
+  feed: state => state.feed,
   headlines: state => state.headlines,
   isAuthenticated: state => !!state.token,
   loading: state => state.loading,

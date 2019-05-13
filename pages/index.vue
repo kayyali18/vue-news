@@ -46,6 +46,23 @@
           <md-option value="us">United States</md-option>
         </md-select>
       </md-field>
+
+
+      <!-- Feed Content -->
+      <md-list class="md-triple-line" v-for="headline in feed" :key="headline.id">
+        <md-list-item>
+          <md-avatar><img :src="headline.urlToImage" :alt="headline.title"></md-avatar>
+
+          <div class="md-list-item-text">
+            <span><a :href="headline.url" target="_blank">{{headline.title}}</a></span>
+            <span>{{headline.source.name}}</span>
+            <span>View Comments</span>
+          </div>
+
+          <md-button class="md-icon-button md-list-action"><md-icon class="md-accent">delete</md-icon></md-button>
+        </md-list-item>
+        <md-divider class="md-inset"></md-divider>
+      </md-list>
     </md-drawer>
 
     <!-- News Categories (Right - Drawer)  -->
@@ -105,7 +122,7 @@
               </md-card-content>
 
               <md-card-actions>
-                <md-button class="md-icon-button">
+                <md-button @click="addHeadlineToFeed(headline)" class="md-icon-button" :class="isInFeed(headline.title)">
                   <md-icon>bookmark</md-icon>
                 </md-button>
                 <md-button class="md-icon-button">
@@ -145,6 +162,8 @@ export default {
         store.state.category
       }`
     )
+
+    await store.dispatch('loadUserFeed')
   },
   watch: {
     async country() {
@@ -161,6 +180,10 @@ export default {
     country() {
       return this.$store.getters.country
     },
+    feed() {
+      let feed = this.$store.getters.feed
+      return this.$store.getters.feed
+    },
     headlines() {
       return this.$store.getters.headlines
     },
@@ -175,8 +198,19 @@ export default {
     }
   },
   methods: {
+    async addHeadlineToFeed(headline) {
+      if (this.user) {
+        await this.$store.dispatch('addHeadlineToFeed', headline)
+      }
+    },
     changeCountry(country) {
       this.$store.commit('setCountry', country)
+    },
+    isInFeed(title) {
+      const inFeed =
+        this.feed.findIndex(headline => headline.title === title) > -1
+
+      return inFeed ? 'md-primary' : ''
     },
     async loadCategory(category) {
       this.$store.commit('setCategory', category)
