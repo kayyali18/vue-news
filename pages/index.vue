@@ -122,7 +122,7 @@
               </md-card-content>
 
               <md-card-actions>
-                <md-button @click="addHeadlineToFeed(headline)" class="md-icon-button">
+                <md-button @click="addHeadlineToFeed(headline)" class="md-icon-button" :class="isInFeed(headline.title)">
                   <md-icon>bookmark</md-icon>
                 </md-button>
                 <md-button class="md-icon-button">
@@ -181,6 +181,7 @@ export default {
       return this.$store.getters.country
     },
     feed() {
+      let feed = this.$store.getters.feed
       return this.$store.getters.feed
     },
     headlines() {
@@ -204,6 +205,12 @@ export default {
     },
     changeCountry(country) {
       this.$store.commit('setCountry', country)
+    },
+    isInFeed(title) {
+      const inFeed =
+        this.feed.findIndex(headline => headline.title === title) > -1
+
+      return inFeed ? 'md-primary' : ''
     },
     async loadCategory(category) {
       this.$store.commit('setCategory', category)

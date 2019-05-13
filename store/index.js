@@ -15,6 +15,7 @@ export const state = () => ({
 // ------- Mutations -------
 
 export const mutations = {
+  clearFeed: state => (state.feed = []),
   clearToken: state => (state.token = ''),
   clearUser: state => (state.user = null),
   setCategory(state, category) {
@@ -113,6 +114,7 @@ export const actions = {
     // Check if user exists first
     if (state.user) {
       const feedRef = db.collection(`users/${state.user.email}/feed`)
+
       await feedRef.onSnapshot(querySnapshot => {
         let headlines = []
         querySnapshot.forEach(doc => {
@@ -125,6 +127,7 @@ export const actions = {
   logoutUser({ commit }) {
     commit('clearToken')
     commit('clearUser')
+    commit('clearFeed')
     clearUserData()
   },
   setLogoutTimer({ dispatch }, interval) {
