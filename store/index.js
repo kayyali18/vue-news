@@ -113,13 +113,12 @@ export const actions = {
     // Check if user exists first
     if (state.user) {
       const feedRef = db.collection(`users/${state.user.email}/feed`)
-
-      await feedRef.get().then(querySnapshot => {
+      await feedRef.onSnapshot(querySnapshot => {
         let headlines = []
         querySnapshot.forEach(doc => {
           headlines.push(doc.data())
-          commit('setFeed', headlines)
         })
+        commit('setFeed', headlines)
       })
     }
   },
