@@ -5,6 +5,7 @@ import { saveUserData, clearUserData } from '@/utils/'
 export const state = () => ({
   category: '',
   country: 'us',
+  feed: [],
   headlines: [],
   loading: false,
   token: '',
@@ -21,6 +22,9 @@ export const mutations = {
   },
   setCountry(state, country) {
     state.country = country
+  },
+  setFeed(state, headlines) {
+    state.feed = headlines
   },
   setHeadlines(state, headlines) {
     state.headlines = headlines
@@ -39,6 +43,13 @@ export const mutations = {
 // ------- Actions -------
 
 export const actions = {
+  async addHeadlineToFeed({ state }, headline) {
+    const feedRef = db
+      .collection(`users/${state.user.email}/feed`)
+      .doc(headline.title)
+
+    await feedRef.set(headline)
+  },
   async authenticateUser({ commit }, userPayload) {
     try {
       // Loading
@@ -98,14 +109,25 @@ export const actions = {
     commit('setLoading', false)
     commit('setHeadlines', articles)
   },
-  setLogoutTimer({ dispatch }, interval) {
-    // Logout user when token expires
-    setTimeout(() => dispatch('logoutUser'), interval)
+  async loadUserFeed({ state, commit }) {
+    const feedRef = db.collection(`users/${state.user.email}/feed`)
+
+    await feedRef.get().then(querySnapshot => {
+      let headlines = []
+      querySnapshot.forEach(doc => {
+        headlines.push(doc.data())
+        commit('setFeed', headlines)
+      })
+    })
   },
   logoutUser({ commit }) {
     commit('clearToken')
     commit('clearUser')
     clearUserData()
+  },
+  setLogoutTimer({ dispatch }, interval) {
+    // Logout user when token expires
+    setTimeout(() => dispatch('logoutUser'), interval)
   }
 }
 
@@ -114,6 +136,7 @@ export const actions = {
 export const getters = {
   category: state => state.category,
   country: state => state.country,
+  feed: state => state.feed,
   headlines: state => state.headlines,
   isAuthenticated: state => !!state.token,
   loading: state => state.loading,

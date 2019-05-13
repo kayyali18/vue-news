@@ -105,7 +105,7 @@
               </md-card-content>
 
               <md-card-actions>
-                <md-button class="md-icon-button">
+                <md-button @click="addHeadlineToFeed(headline)" class="md-icon-button">
                   <md-icon>bookmark</md-icon>
                 </md-button>
                 <md-button class="md-icon-button">
@@ -145,6 +145,8 @@ export default {
         store.state.category
       }`
     )
+
+    await store.dispatch('loadUserFeed')
   },
   watch: {
     async country() {
@@ -161,6 +163,9 @@ export default {
     country() {
       return this.$store.getters.country
     },
+    feed() {
+      return this.$store.getters.feed
+    },
     headlines() {
       return this.$store.getters.headlines
     },
@@ -175,6 +180,11 @@ export default {
     }
   },
   methods: {
+    async addHeadlineToFeed(headline) {
+      if (this.user) {
+        await this.$store.dispatch('addHeadlineToFeed', headline)
+      }
+    },
     changeCountry(country) {
       this.$store.commit('setCountry', country)
     },
