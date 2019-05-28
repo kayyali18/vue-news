@@ -1,10 +1,10 @@
 # vue-news
 
-> A news application built with Nuxt 2 and Firestore
+> A news application built with Nuxt 2 and Firestore by Ahmad K.
 
 ## Build Setup
 
-``` bash
+```bash
 # install dependencies
 $ npm install
 
