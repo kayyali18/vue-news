@@ -47,9 +47,15 @@
         </md-select>
       </md-field>
 
+      <!-- Default Markup (if Feed Empty) -->
+      <md-empty-state class="md-primary" v-if="feed.length === 0 && !user" md-icon="bookmarks" md-label="Nothing in Feed" md-description="Login to bookmark headlines">
+        <md-button @click="$router.push('/login')" class="md-primary md-raised">Login</md-button>
+      </md-empty-state>
 
-      <!-- Feed Content -->
-      <md-list class="md-triple-line" v-for="headline in feed" :key="headline.id">
+    <md-empty-state v-else-if="feed.length === 0" class="md-accent" md-icon="bookmark_outline" md-label="Nothing in Feed" md-description="Anything you bookmark will be safely stored here"></md-empty-state>
+
+      <!-- Feed Content (if Feed Not Empty) -->
+      <md-list class="md-triple-line" v-else v-for="headline in feed" :key="headline.id">
         <md-list-item>
           <md-avatar><img :src="headline.urlToImage" :alt="headline.title"></md-avatar>
 
@@ -59,7 +65,7 @@
             <span>View Comments</span>
           </div>
 
-          <md-button class="md-icon-button md-list-action"><md-icon class="md-accent">delete</md-icon></md-button>
+          <md-button @click="removeHeadlineFromFeed(headline)" class="md-icon-button md-list-action"><md-icon class="md-accent">delete</md-icon></md-button>
         </md-list-item>
         <md-divider class="md-inset"></md-divider>
       </md-list>
@@ -221,6 +227,9 @@ export default {
     },
     logoutUser() {
       this.$store.dispatch('logoutUser')
+    },
+    async removeHeadlineFromFeed(headline) {
+      await this.$store.dispatch('removeHeadlineFromFeed', headline)
     }
   }
 }

@@ -125,6 +125,11 @@ export const actions = {
           headlines.push(doc.data())
           commit('setFeed', headlines)
         })
+
+        if (querySnapshot.empty) {
+          headlines = []
+          commit('setFeed', headlines)
+        }
       })
     }
   },
@@ -133,6 +138,13 @@ export const actions = {
     commit('clearUser')
     commit('clearFeed')
     clearUserData()
+  },
+  async removeHeadlineFromFeed({ state }, headline) {
+    const headlineRef = db
+      .collection(`users/${state.user.email}/feed`)
+      .doc(headline.title)
+
+    await headlineRef.delete()
   },
   setLogoutTimer({ dispatch }, interval) {
     // Logout user when token expires
