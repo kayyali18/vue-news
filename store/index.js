@@ -187,6 +187,24 @@ export const actions = {
       await headlineRef.set(headline)
     }
   },
+  async sendComment({ state, commit }, comment) {
+    const commentsRef = db.collection(
+      `headlines/${state.headline.slug}/comments`
+    )
+
+    commit('setLoading', true)
+    await commentsRef.doc(comment.id).set(comment)
+    await commentsRef.get().then(querySnapshot => {
+      let comments = []
+      let updatedHeadline
+      querySnapshot.forEach(doc => {
+        comments.push(doc.data())
+        updatedHeadline = { ...state.headline, comments }
+      })
+      commit('setHeadline', updatedHeadline)
+    })
+    commit('setLoading', false)
+  },
   setLogoutTimer({ dispatch }, interval) {
     // Logout user when token expires
     setTimeout(() => dispatch('logoutUser'), interval)
