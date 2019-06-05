@@ -131,7 +131,7 @@
                 <md-button @click="addHeadlineToFeed(headline)" class="md-icon-button" :class="isInFeed(headline.title)">
                   <md-icon>bookmark</md-icon>
                 </md-button>
-                <md-button class="md-icon-button">
+                <md-button @click="saveHeadline(headline)" class="md-icon-button">
                   <md-icon>message</md-icon>
                 </md-button>
               </md-card-actions>
@@ -230,6 +230,9 @@ export default {
     },
     async removeHeadlineFromFeed(headline) {
       await this.$store.dispatch('removeHeadlineFromFeed', headline)
+    },
+    saveHeadline(headline) {
+      this.$router.push(`/headlines/${headline.slug}`)
     }
   }
 }
