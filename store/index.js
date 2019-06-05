@@ -7,6 +7,7 @@ export const state = () => ({
   category: '',
   country: 'us',
   feed: [],
+  headline: null,
   headlines: [],
   loading: false,
   token: '',
@@ -27,6 +28,9 @@ export const mutations = {
   },
   setFeed(state, headlines) {
     state.feed = [...headlines]
+  },
+  setHeadline(state, headline) {
+    state.headline = headline
   },
   setHeadlines(state, headlines) {
     state.headlines = headlines
@@ -108,6 +112,16 @@ export const actions = {
       commit('setLoading', false)
     }
   },
+  async loadHeadline({ commit }, headlineSlug) {
+    const headlineRef = db.collection('headlines').doc(headlineSlug)
+
+    await headlineRef.get().then(doc => {
+      if (doc.exists) {
+        const headline = doc.data()
+        commit('setHeadline', headline)
+      }
+    })
+  },
   async loadHeadlines({ commit }, apiUrl) {
     commit('setLoading', true)
     const { articles } = await this.$axios.$get(apiUrl)
@@ -156,6 +170,23 @@ export const actions = {
 
     await headlineRef.delete()
   },
+  async saveHeadline(context, headline) {
+    const headlineRef = db.collection('headlines').doc(headline.slug)
+
+    let headlineId
+
+    // Check if document exists with headline
+    await headlineRef.get().then(doc => {
+      if (doc.exists) {
+        headlineId = doc.id
+      }
+    })
+
+    if (!headlineId) {
+      // Set in firestore
+      await headlineRef.set(headline)
+    }
+  },
   setLogoutTimer({ dispatch }, interval) {
     // Logout user when token expires
     setTimeout(() => dispatch('logoutUser'), interval)
@@ -168,6 +199,7 @@ export const getters = {
   category: state => state.category,
   country: state => state.country,
   feed: state => state.feed,
+  headline: state => state.headline,
   headlines: state => state.headlines,
   isAuthenticated: state => !!state.token,
   loading: state => state.loading,

@@ -231,8 +231,11 @@ export default {
     async removeHeadlineFromFeed(headline) {
       await this.$store.dispatch('removeHeadlineFromFeed', headline)
     },
-    saveHeadline(headline) {
-      this.$router.push(`/headlines/${headline.slug}`)
+    async saveHeadline(headline) {
+      await this.$store.dispatch('saveHeadline', headline).then(() => {
+        // push after it's in database
+        this.$router.push(`/headlines/${headline.slug}`)
+      })
     }
   }
 }
