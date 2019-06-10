@@ -1,6 +1,6 @@
 # vue-news
 
-> A news application built with Nuxt 2 and Firestore by Ahmad K.
+> A news application built with Nuxt 2 and Firestore by Ahmad K. The best
 
 ## Build Setup
 
