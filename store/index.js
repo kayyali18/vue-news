@@ -2,6 +2,7 @@ import md5 from 'md5'
 import slugify from 'slugify'
 import db from '@/plugins/firestore'
 import { saveUserData, clearUserData } from '@/utils/'
+import defaultImage from '~/assets/img/default-image.jpeg'
 
 export const state = () => ({
   category: '',
@@ -10,6 +11,7 @@ export const state = () => ({
   headline: null,
   headlines: [],
   loading: false,
+  source: '',
   token: '',
   user: null
 })
@@ -37,6 +39,9 @@ export const mutations = {
   },
   setLoading(state, loading) {
     state.loading = loading
+  },
+  setSource(state, source) {
+    state.source = source
   },
   setToken(state, token) {
     state.token = token
@@ -181,6 +186,9 @@ export const actions = {
         remove: /[^a-zA-Z0-9 -]/g,
         lower: true
       })
+      if (!article.urlToImage) {
+        article.urlToImage = defaultImage
+      }
       const headline = { ...article, slug }
       return headline
     })
@@ -273,6 +281,7 @@ export const getters = {
   headline: state => state.headline,
   headlines: state => state.headlines,
   isAuthenticated: state => !!state.token,
+  source: state => state.source,
   loading: state => state.loading,
   user: state => state.user
 }
