@@ -1,5 +1,5 @@
 {
-  "name": "vue-news",
+  "name": "thinker-news",
   "version": "1.0.0",
   "description": "A news application built with Nuxt 2 and Firestore",
   "author": "Ahmad Kayyali",
