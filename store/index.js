@@ -115,10 +115,25 @@ export const actions = {
   async loadHeadline({ commit }, headlineSlug) {
     const headlineRef = db.collection('headlines').doc(headlineSlug)
 
-    await headlineRef.get().then(doc => {
+    const commentsRef = db.collection(`headlines/${headlineSlug}/comments`)
+
+    let loadedHeadline = {}
+    await headlineRef.get().then(async doc => {
       if (doc.exists) {
-        const headline = doc.data()
-        commit('setHeadline', headline)
+        loadedHeadline = doc.data()
+
+        await commentsRef.get().then(querySnapshot => {
+          if (querySnapshot.empty) {
+            commit('setHeadline', loadedHeadline)
+          }
+
+          let loadedComments = []
+          querySnapshot.forEach(doc => {
+            loadedComments.push(doc.data())
+            loadedHeadline['comments'] = loadedComments
+            commit('setHeadline', loadedHeadline)
+          })
+        })
       }
     })
   },
