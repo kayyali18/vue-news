@@ -18,3 +18,16 @@ $amber: #ff8f00;
 $deep-orange: #d74315;
 $gold: #ffbf00;
 $background-gray: #eee;
+
+// Page Transitions
+
+.page-enter,
+.page-leave-to {
+  transform: translateY(-20px);
+  opacity: 0;
+}
+
+.page-enter-active,
+.page-leave-active {
+  transition: all 0.25s;
+}

@@ -23,11 +23,38 @@
         <md-button @click="$router.push('/login')">Login</md-button>
         <md-button @click="$router.push('/register')">Register</md-button>
         </template>
+        <md-button class="md-primary" @click="showSearchDialog = true">Search</md-button>
         <md-button class="md-accent" @click="showRightSidepanel = true">
           Categories
         </md-button>
       </div>
     </md-toolbar>
+
+    <!-- Search Dialog -->
+    <md-dialog :md-active.sync="showSearchDialog">
+      <md-dialog-title>Search Headlines</md-dialog-title>
+
+        <div class="md-layout" style="padding: 1em">
+          <md-field>
+            <label for="search-box">Search Term(s)</label>
+            <md-input id="search-box" v-model="query" placeholder="Use quotes for exact matches, AND / OR / NOT for multiple terms" maxlength="30"></md-input>
+          </md-field>
+          <md-datepicker v-model="fromDate" md-immediately><label>Select starting date (optional)</label></md-datepicker>
+          <md-datepicker v-model="toDate" md-immediately><label>Select ending date (optional)</label></md-datepicker>
+          <md-field><label for="sortBy">Sort search results by criteria (optional)</label>
+            <md-select v-model="sortBy" name="sortBy" id="sortBy">
+              <md-option value="publishedAt">Newest (default)</md-option>
+              <md-option value="relevancy">Relevant</md-option>
+              <md-option value="popularity">Popular</md-option>
+            </md-select>
+          </md-field>
+        </div>
+        
+        <md-dialog-actions>
+          <md-button class="md-accent" @click="showSearchDialog = false">Cancel</md-button>
+          <md-button class="md-primary" @click="searchHeadlines">Search</md-button>
+        </md-dialog-actions>
+    </md-dialog>
 
     <!-- Personal News Feed (Left - Drawer) -->
     <md-drawer md-fixed :md-active.sync="showLeftSidepanel">
@@ -62,7 +89,7 @@
           <div class="md-list-item-text">
             <span><a :href="headline.url" target="_blank">{{headline.title}}</a></span>
             <span>{{headline.source.name}}</span>
-            <span>View Comments</span>
+            <span @click="saveHeadline(headline)">View Comments</span>
           </div>
 
           <md-button @click="removeHeadlineFromFeed(headline)" class="md-icon-button md-list-action"><md-icon class="md-accent">delete</md-icon></md-button>
@@ -107,7 +134,7 @@
                   <a :href="headline.url" target="_blank">{{headline.title}}</a>
                 </div>
 
-                <div>
+                <div @click="loadSource(headline.source.id)">
                   {{headline.source.name}}
                   <md-icon class="small-icon">book</md-icon>
                 </div>
@@ -118,7 +145,7 @@
                 </div>
 
                 <div class="md-subhead">
-                  {{headline.publishedAt}}
+                  {{headline.publishedAt | publishedTimeToNow}}
                   <md-icon class="small-icon">alarm</md-icon>
                 </div>
               </md-card-header>
@@ -131,7 +158,7 @@
                 <md-button @click="addHeadlineToFeed(headline)" class="md-icon-button" :class="isInFeed(headline.title)">
                   <md-icon>bookmark</md-icon>
                 </md-button>
-                <md-button class="md-icon-button">
+                <md-button @click="saveHeadline(headline)" class="md-icon-button">
                   <md-icon>message</md-icon>
                 </md-button>
               </md-card-actions>
@@ -150,6 +177,7 @@ export default {
   data: () => ({
     showLeftSidepanel: false,
     showRightSidepanel: false,
+    showSearchDialog: false,
     newsCategories: [
       { name: 'Top Headlines', path: '', icon: 'today' },
       { name: 'Technology', path: 'technology', icon: 'keyboard' },
@@ -158,7 +186,11 @@ export default {
       { name: 'Health', path: 'health', icon: 'fastfood' },
       { name: 'Science', path: 'science', icon: 'fingerprint' },
       { name: 'Sports', path: 'sports', icon: 'pool' }
-    ]
+    ],
+    query: '',
+    fromDate: '',
+    toDate: '',
+    sortBy: ''
   }),
   // Has access to context object
   async fetch({ store }) {
@@ -199,6 +231,9 @@ export default {
     loading() {
       return this.$store.getters.loading
     },
+    source() {
+      return this.$store.getters.source
+    },
     user() {
       return this.$store.getters.user
     }
@@ -211,6 +246,11 @@ export default {
     },
     changeCountry(country) {
       this.$store.commit('setCountry', country)
+    },
+    dateToISOString(date) {
+      if (date) {
+        return new Date(date).toISOString()
+      }
     },
     isInFeed(title) {
       const inFeed =
@@ -225,11 +265,35 @@ export default {
         `/api/top-headlines?country=${this.country}&category=${this.category}`
       )
     },
+    async loadSource(sourceId) {
+      if (sourceId) {
+        this.$store.commit('setSource', sourceId)
+        await this.$store.dispatch(
+          'loadHeadlines',
+          `/api/top-headlines?sources=${this.source}`
+        )
+      }
+    },
     logoutUser() {
       this.$store.dispatch('logoutUser')
     },
     async removeHeadlineFromFeed(headline) {
       await this.$store.dispatch('removeHeadlineFromFeed', headline)
+    },
+    async saveHeadline(headline) {
+      await this.$store.dispatch('saveHeadline', headline).then(() => {
+        // push after it's in database
+        this.$router.push(`/headlines/${headline.slug}`)
+      })
+    },
+    async searchHeadlines() {
+      await this.$store.dispatch(
+        'loadHeadlines',
+        `/api/everything?q=${this.query}&from=${this.dateToISOString(
+          this.fromDate
+        )}&to=${this.dateToISOString(this.toDate)}&sortBy=${this.sortBy}`
+      )
+      this.showSearchDialog = false
     }
   }
 }
