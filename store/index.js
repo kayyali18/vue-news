@@ -112,10 +112,45 @@ export const actions = {
       commit('setLoading', false)
     }
   },
+  async likeComment({ state, commit }, commentId) {
+    const commentsRef = db
+      .collection(`headlines/${state.headline.slug}/comments`)
+      .orderBy('likes', 'desc')
+    const likedCommentRef = db
+      .collection('headlines')
+      .doc(state.headline.slug)
+      .collection('comments')
+      .doc(commentId)
+
+    await likedCommentRef.get().then(doc => {
+      if (doc.exists) {
+        const prevLikes = doc.data().likes
+        const currentLikes = prevLikes + 1
+        likedCommentRef.update({
+          likes: currentLikes
+        })
+      }
+    })
+
+    await commentsRef.onSnapshot(querySnapshot => {
+      let loadedComments = []
+      let updatedHeadline
+      querySnapshot.forEach(doc => {
+        loadedComments.push(doc.data())
+        updatedHeadline = {
+          ...state.headline,
+          comments: [...loadedComments]
+        }
+        commit('setHeadline', updatedHeadline)
+      })
+    })
+  },
   async loadHeadline({ commit }, headlineSlug) {
     const headlineRef = db.collection('headlines').doc(headlineSlug)
 
-    const commentsRef = db.collection(`headlines/${headlineSlug}/comments`)
+    const commentsRef = db
+      .collection(`headlines/${headlineSlug}/comments`)
+      .orderBy('likes', 'desc')
 
     let loadedHeadline = {}
     await headlineRef.get().then(async doc => {
@@ -131,8 +166,8 @@ export const actions = {
           querySnapshot.forEach(doc => {
             loadedComments.push(doc.data())
             loadedHeadline['comments'] = loadedComments
-            commit('setHeadline', loadedHeadline)
           })
+          commit('setHeadline', loadedHeadline)
         })
       }
     })
@@ -209,15 +244,18 @@ export const actions = {
 
     commit('setLoading', true)
     await commentsRef.doc(comment.id).set(comment)
-    await commentsRef.get().then(querySnapshot => {
-      let comments = []
-      let updatedHeadline
-      querySnapshot.forEach(doc => {
-        comments.push(doc.data())
-        updatedHeadline = { ...state.headline, comments }
+    await commentsRef
+      .orderBy('likes', 'desc')
+      .get()
+      .then(querySnapshot => {
+        let comments = []
+        let updatedHeadline
+        querySnapshot.forEach(doc => {
+          comments.push(doc.data())
+          updatedHeadline = { ...state.headline, comments }
+        })
+        commit('setHeadline', updatedHeadline)
       })
-      commit('setHeadline', updatedHeadline)
-    })
     commit('setLoading', false)
   },
   setLogoutTimer({ dispatch }, interval) {

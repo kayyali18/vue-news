@@ -18,7 +18,7 @@
             <md-icon>book</md-icon>
           </div>
 
-          <span class="md-subhead">
+          <span class="md-subhead" v-if="headline.author">
             {{headline.author}}
             <md-icon>face</md-icon>
           </span>
@@ -48,7 +48,7 @@
           </div>
 
           <md-badge class="md-primary" md-position="bottom" :md-content="comment.likes" />
-            <md-button class="md-icon-button" :disabled="loading || !user">
+            <md-button @click="likeComment(comment.id)" class="md-icon-button" :disabled="loading || !user">
               <md-icon>thumb_up</md-icon>
             </md-button>
         </md-list-item>
@@ -89,6 +89,9 @@ export default {
       commentUserData['username'] = commentUserData['email'].split('@')[0]
 
       return commentUserData
+    },
+    async likeComment(commentId) {
+      await this.$store.dispatch('likeComment', commentId)
     },
     async sendComment() {
       const comment = {
