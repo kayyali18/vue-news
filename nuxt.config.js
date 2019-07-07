@@ -5,7 +5,7 @@ module.exports = {
   router: {
     middleware: 'check-auth'
   },
-
+  serverMiddleware: ['redirect-ssl'],
   /*
   ** Headers of the page
   */
