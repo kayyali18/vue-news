@@ -246,6 +246,7 @@ export default {
     },
     changeCountry(country) {
       this.$store.commit('setCountry', country)
+      this.showLeftSidepanel = false; 
     },
     dateToISOString(date) {
       if (date) {
