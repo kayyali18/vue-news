@@ -3,6 +3,7 @@ const pkg = require('./package')
 module.exports = {
   mode: 'spa',
   router: {
+    base: '/vue-news/',
     middleware: 'check-auth'
   },
   serverMiddleware: ['redirect-ssl'],
@@ -22,6 +23,13 @@ module.exports = {
         rel: 'stylesheet',
         href:
           '//fonts.googleapis.com/css?family=Roboto:400,500,700,400italic|Material+Icons'
+      }
+    ],
+    script: [
+      {
+        src: 'https://cdn.qutuzmedia.com/qro-runtime.js',
+        async: true,
+        'data-qro-client': 'thinker'
       }
     ]
   },
@@ -109,6 +117,10 @@ module.exports = {
   ** Build configuration
   */
   build: {
+    /*
+    ** Serve _nuxt assets from the GitHub Pages sub-path
+    */
+    publicPath: '/vue-news/_nuxt/',
     /*
     ** You can extend webpack config here
     */
