@@ -1,0 +1,33 @@
+@import url('https://fonts.googleapis.com/css?family=Tangerine:700');
+@import '~vue-material/dist/theme/engine';
+
+@include md-register-theme(
+  'default',
+  (
+    primary: md-get-palette-color(deeporange, 800),
+    accent: #171717,
+    theme: light
+  )
+);
+
+@import '~vue-material/dist/theme/all';
+
+// Colors
+
+$amber: #ff8f00;
+$deep-orange: #d74315;
+$gold: #ffbf00;
+$background-gray: #eee;
+
+// Page Transitions
+
+.page-enter,
+.page-leave-to {
+  transform: translateY(-20px);
+  opacity: 0;
+}
+
+.page-enter-active,
+.page-leave-active {
+  transition: all 0.25s;
+}
